@@ -4,11 +4,13 @@
 
 let voteLimit = 25;
 let voteItems = [];
+let lastUsedItemsIndexs = [];
 
 //***DOM References***//
 
 let imgArticle = document.getElementById('imgs-article');
 let results = document.getElementById('results');
+let graphContainer = document.getElementById('chart-cont');
 let resultsButton;
 
 let imgContainerOne = document.getElementById('img-cont-1');
@@ -41,6 +43,10 @@ let currentImgs = [
   itemImgThree
 ];
 
+let itemNames = [];
+let itemVotes = [];
+let itemViews = [];
+
 //***Constructor***//
 
 function VoteItem(name, itemImgExtension = 'jpg') {
@@ -52,7 +58,7 @@ function VoteItem(name, itemImgExtension = 'jpg') {
   voteItems.push(this);
 }
 
-//***Genereate Items***//
+//***Generation***//
 
 function generateVoteItems() {
   let bag = new VoteItem('bag');
@@ -76,20 +82,52 @@ function generateVoteItems() {
   let wineGlass = new VoteItem('wine-glass');
 }
 
+function generateColors(color = 0, colorCount) {
+  let tempColorsSolid = [];
+  let tempColorsOpaque = [];
+  let tempHalfColorsSolid = [];
+  let tempHalfColorsOpaque = [];
+  let tempColorSolid = 0;
+  let tempColorOpaque = 0;
+  let tempHalfColorSolid = 0;
+  let tempHalfColorOpaque = 0;
+
+  if (color === 0) {
+    tempColorSolid = [255, 0, 0, 1];
+    tempColorOpaque = [255, 0, 0, 0.2];
+    tempHalfColorSolid = [155, 155, 0, 1];
+    tempHalfColorOpaque = [155, 155, 0, 0.2];
+  } else if (color === 1) {
+    tempColorSolid = [0, 255, 0, 1];
+    tempColorOpaque = [0, 255, 0, 0.2];
+    tempHalfColorSolid = [0, 155, 155, 1];
+    tempHalfColorOpaque = [0, 155, 155, 0.2];
+  } else {
+    tempColorSolid = [0, 0, 255, 1];
+    tempColorOpaque = [0, 0, 255, 0.2];
+    tempHalfColorSolid = [155, 0, 155, 1];
+    tempHalfColorOpaque = [155, 0, 155, 0.2];
+  }
+
+  for (let i = 0; i < colorCount; i++) {
+    tempColorsSolid.push(`rgba(${tempColorSolid})`);
+    tempColorsOpaque.push(`rgba(${tempColorOpaque})`);
+    tempHalfColorsSolid.push(`rgba(${tempHalfColorSolid})`);
+    tempHalfColorsOpaque.push(`rgba(${tempHalfColorOpaque})`);
+  }
+
+  return [tempColorsSolid, tempColorsOpaque, tempHalfColorsSolid, tempHalfColorsOpaque];
+}
+
 //***Execution***//
 
 generateVoteItems();
-
 renderVoteItems();
 
 //***Renderers***//
 
 function renderVoteItems() {
-  let voteItemsIndexs = [];
-
-  for (let i = 0; i < 3; i++) {
-    voteItemsIndexs.push(randomIndexChecker(voteItemsIndexs));
-  }
+  let voteItemsIndexs = getRandomIndexs();
 
   for (let i = 0; i < currentHeads.length; i++) {
     currentHeads[i].textContent = voteItems[voteItemsIndexs[i]].itemName;
@@ -112,14 +150,47 @@ function renderButton() {
 }
 
 function renderVoteList() {
-  let ul = document.createElement('ul');
-  results.appendChild(ul);
+  let canvas = document.createElement('canvas');
 
   for (let i = 0; i < voteItems.length; i++) {
-    let templi = document.createElement('li');
-    templi.textContent = `${voteItems[i].itemName} was viewed ${voteItems[i].views} and was voted on ${voteItems[i].votes} times.`;
-    ul.appendChild(templi);
+    itemNames.push(voteItems[i].itemName);
+    itemVotes.push(voteItems[i].votes);
+    itemViews.push(voteItems[i].views);
   }
+
+  let colors = generateColors(Math.floor(Math.random() * 3), voteItems.length);
+
+  let chart = {
+    type: 'bar',
+    data: {
+      labels: itemNames,
+      datasets: [{
+        label: 'Votes',
+        data: itemVotes,
+        backgroundColor: colors[1],
+        borderColor: colors[0],
+        borderWidth: 1
+      },
+      {
+        label: 'Views',
+        data: itemViews,
+        backgroundColor: colors[3],
+        borderColor: colors[2],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  };
+
+  new Chart(canvas, chart);
+
+  graphContainer.appendChild(canvas);
 
   resultsButton.removeEventListener('click', renderVoteList);
   resultsButton.remove();
@@ -131,22 +202,38 @@ function randomIndexGenerator() {
   return Math.floor(Math.random() * voteItems.length);
 }
 
-function randomIndexChecker(voteItemsIndexs) {
-  let tempIndex = randomIndexGenerator();
-  let checkIndex = true;
+function getRandomIndexs(tempIndexs = []) {
+  let tempIndex;
+  let checkIndexs = true;
+  let checkLastUsedIndexs = true;
 
-  if (voteItemsIndexs.length === 0) {
-    return tempIndex;
-  } else while (checkIndex) {
-    for (let i = 0; i < voteItemsIndexs.length; i++) {
-      if (tempIndex === voteItemsIndexs[i]) {
+  while (checkIndexs) {
+    tempIndex = randomIndexGenerator();
+    while (checkLastUsedIndexs) {
+      if (lastUsedItemsIndexs.includes(tempIndex)) {
         tempIndex = randomIndexGenerator();
-        i = 0;
+      } else {
+        checkLastUsedIndexs = false;
       }
     }
-    checkIndex = false;
+
+    if (tempIndexs.length === 0) {
+      tempIndexs.push(tempIndex);
+    } else if (tempIndexs.includes(tempIndex)) {
+      tempIndex = randomIndexGenerator();
+    } else {
+      tempIndexs.push(tempIndex);
+    }
+
+    checkLastUsedIndexs = true;
+
+    if (tempIndexs.length === 3) {
+      checkIndexs = false;
+    }
   }
-  return tempIndex;
+
+  lastUsedItemsIndexs = tempIndexs;
+  return tempIndexs;
 }
 
 //***Event Handlers***//
@@ -177,4 +264,3 @@ function processVoteClick(event) {
 //***Primary Event Listener***//
 
 imgArticle.addEventListener('click', processVoteClick);
-
