@@ -47,6 +47,10 @@ let itemNames = [];
 let itemVotes = [];
 let itemViews = [];
 
+//***Local Storage Parser***//
+
+let parsedVoteItemPackage = JSON.parse(localStorage.getItem('voteItemsPackage'));
+
 //***Constructor***//
 
 function VoteItem(name, itemImgExtension = 'jpg') {
@@ -61,25 +65,30 @@ function VoteItem(name, itemImgExtension = 'jpg') {
 //***Generation***//
 
 function generateVoteItems() {
-  let bag = new VoteItem('bag');
-  let banana = new VoteItem('banana');
-  let bathroom = new VoteItem('bathroom');
-  let boots = new VoteItem('boots');
-  let breakfast = new VoteItem('breakfast');
-  let bubblegum = new VoteItem('bubblegum');
-  let chair = new VoteItem('chair');
-  let cthulhu = new VoteItem('cthulhu');
-  let dogDuck = new VoteItem('dog-duck');
-  let dragon = new VoteItem('dragon');
-  let pen = new VoteItem('pen');
-  let petSweep = new VoteItem('pet-sweep');
-  let scissors = new VoteItem('scissors');
-  let shark = new VoteItem('shark');
-  let sweep = new VoteItem('sweep', 'png');
-  let tauntaun = new VoteItem('tauntaun');
-  let unicorn = new VoteItem('unicorn');
-  let waterCan = new VoteItem('water-can');
-  let wineGlass = new VoteItem('wine-glass');
+
+  if(parsedVoteItemPackage){
+    voteItems = parsedVoteItemPackage;
+  } else {
+    let bag = new VoteItem('bag');
+    let banana = new VoteItem('banana');
+    let bathroom = new VoteItem('bathroom');
+    let boots = new VoteItem('boots');
+    let breakfast = new VoteItem('breakfast');
+    let bubblegum = new VoteItem('bubblegum');
+    let chair = new VoteItem('chair');
+    let cthulhu = new VoteItem('cthulhu');
+    let dogDuck = new VoteItem('dog-duck');
+    let dragon = new VoteItem('dragon');
+    let pen = new VoteItem('pen');
+    let petSweep = new VoteItem('pet-sweep');
+    let scissors = new VoteItem('scissors');
+    let shark = new VoteItem('shark');
+    let sweep = new VoteItem('sweep', 'png');
+    let tauntaun = new VoteItem('tauntaun');
+    let unicorn = new VoteItem('unicorn');
+    let waterCan = new VoteItem('water-can');
+    let wineGlass = new VoteItem('wine-glass');
+  }
 }
 
 function generateColors(color = 0, colorCount) {
@@ -255,6 +264,8 @@ function processVoteClick(event) {
   }
 
   if (voteLimit === 0) {
+    localStorage.setItem('voteItemsPackage', JSON.stringify(voteItems));
+
     imgArticle.removeEventListener('click', processVoteClick);
     renderButton();
     resultsButton.addEventListener('click', renderVoteList);
