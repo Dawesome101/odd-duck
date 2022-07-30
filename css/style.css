@@ -28,18 +28,35 @@ nav {
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 5vw;
+  width: 100%;
 }
 
 button {
   margin: 2vw 0 2vw 0;
   height: 10vw;
-  width: 100%;
+  width: 90%;
   border: 5px groove grey;
   border-radius: 4em;
   background-color: green;
   color: white;
   font-family: 'Chelsea Market', cursive;
   font-size: xx-large;
+}
+
+button:hover {
+  width: 75%;
+  height: 12vw;
+  position: absolute;
+  border: 5px double aquamarine;
+}
+
+button:active {
+  width: 65%;
+  height: 10vw;
+  background-color: darkslategray;
+  border: 5px ridge green;
+  position: absolute;
 }
 
 article {
@@ -63,13 +80,28 @@ article h2 {
 }
 
 article img {
-  width: 90%;
+  width: 15vw;
+  height: 15vw;
   border: 5px double grey;
   border-radius: 2em;
 }
 
+article img:hover {
+  position: absolute;
+  width: 25vw;
+  height: 20vw;
+  border: 5px ridge aquamarine;
+}
+
+article img:active {
+  position: absolute;
+  border: 5px groove green;
+  width: 23vw;
+  height: 18vw;
+}
+
 canvas {
-  margin-bottom: 1vw;
+  margin: 2vw 0 2vw 0;
 }
 
 footer {
