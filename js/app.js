@@ -153,12 +153,16 @@ function renderVoteItems() {
 }
 
 function renderButton() {
+  results.style.height = '15vw';
   resultsButton = document.createElement('button');
   results.appendChild(resultsButton);
   resultsButton.textContent = 'Show Results';
+  imgArticle.remove();
 }
 
 function renderVoteList() {
+  results.style.height = '0%';
+
   let canvas = document.createElement('canvas');
 
   for (let i = 0; i < voteItems.length; i++) {
